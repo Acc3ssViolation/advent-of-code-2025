@@ -25,7 +25,7 @@ namespace Advent.Assignments
                 var asf = 0;
                 for (var click = 0; click < num; click++)
                 {
-                    dial = (dial + dir ) % DialSize;
+                    dial = (dial + dir) % DialSize;
 
                     if (dial == 0)
                         asf++;
