@@ -8,29 +8,22 @@ namespace Advent.Assignments
     {
         public string Run(IReadOnlyList<string> input)
         {
-            var left = new List<int>(input.Count);
-            var right = new List<int>(input.Count);
-
+            const int DialSize = 100;
+            var dial = 50;
+            var zeroCount = 0;
             foreach (var item in input)
             {
-                var numbers = item.ExtractInts();
-                left.Add(numbers[0]);
-                right.Add(numbers[1]);
+                var num = int.Parse(item[1..]) % DialSize;
+                if (item[0] == 'L')
+                    num = DialSize - num;
+                Debug.Assert(num >= 0);
+                Debug.Assert(num <= DialSize);
+                dial = (dial + num) % DialSize;
+                if (dial == 0)
+                    zeroCount++;
             }
 
-            left.Sort();
-            right.Sort();
-
-            Debug.Assert(left.Count == right.Count);
-
-            var sum = 0;
-            for (var i = 0; i < left.Count; i++)
-            {
-                var delta = Math.Abs(left[i] - right[i]);
-                sum += delta;
-            }
-
-            return sum.ToString();
+            return zeroCount.ToString();
         }
     }
 }
