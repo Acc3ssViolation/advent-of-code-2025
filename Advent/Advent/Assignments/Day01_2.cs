@@ -19,21 +19,26 @@ namespace Advent.Assignments
 
                 num %= DialSize;
 
-                var dir = item[0] == 'L' ? DialSize - 1 : 1;
-
-                // fuck it i'm tired
-                var asf = 0;
-                for (var click = 0; click < num; click++)
+                var prevDial = dial;
+                if (item[0] == 'L')
                 {
-                    dial = (dial + dir) % DialSize;
+                    // Turn LEFT aka the dial value decreases
+                    dial = (dial + DialSize - num) % DialSize;
 
-                    if (dial == 0)
-                        asf++;
+                    // If the dial value increased that means we crossed the zero
+                    // Alternatively if we landed on zero we must also count it
+                    if ((dial > prevDial || dial == 0) && prevDial != 0)
+                        zeroCount++;
                 }
+                else
+                {
+                    // Turn RIGHT aka the dial value increases
+                    dial = (dial + num) % DialSize;
 
-                //Logger.DebugLine($"The dial is rotated {item} to the point at {dial}; during this rotation, it points at 0 {asf}");
-
-                zeroCount += asf;
+                    // If the dial value decreased that means we crossed the zero (or ended on it)
+                    if (dial < prevDial && prevDial != 0)
+                        zeroCount++;
+                }
             }
 
             return zeroCount.ToString();
