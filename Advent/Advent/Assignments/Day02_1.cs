@@ -1,13 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Advent.Assignments
 {
     internal class Day02_1 : IAssignment
     {
+        private static readonly long[] Powers =
+        [
+            1,
+            10,
+            100,
+            1000,
+            10000,
+            100000,
+            1000000,
+            10000000,
+            100000000,
+            1000000000,
+            10000000000,
+            100000000000,
+            1000000000000,
+            10000000000000,
+            100000000000000,
+            1000000000000000,
+            10000000000000000,
+            100000000000000000,
+            1000000000000000000,
+        ];
+
         public string Run(IReadOnlyList<string> input)
         {
             var ranges = input[0].Split(',');
@@ -29,7 +49,7 @@ namespace Advent.Assignments
                     }
 
                     var halfDigits = digits / 2;
-                    var factor = (long)Math.Pow(10, halfDigits);
+                    var factor = Powers[halfDigits];
                     var upper = id / factor;
                     var lower = id % factor;
                     if (upper == lower)

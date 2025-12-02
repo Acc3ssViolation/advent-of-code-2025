@@ -1,29 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Advent.Assignments
 {
     internal class Day02_2 : IAssignment
     {
-        private static bool IsRepeatingNumber(long number)
-        {
-            var digits = (long)Math.Log10(number) + 1;
-            if ((digits & 1) != 0)
-            {
-                // Cannot contain two identical parts if odd
-                return false;
-            }
-
-            var halfDigits = digits / 2;
-            var factor = (long)Math.Pow(10, halfDigits);
-            var upper = number / factor;
-            var lower = number % factor;
-            return upper == lower;
-        }
+        private static readonly long[] Powers =
+        [
+            1,
+            10,
+            100,
+            1000,
+            10000,
+            100000,
+            1000000,
+            10000000,
+            100000000,
+            1000000000,
+            10000000000,
+            100000000000,
+            1000000000000,
+            10000000000000,
+            100000000000000,
+            1000000000000000,
+            10000000000000000,
+            100000000000000000,
+            1000000000000000000,
+        ];
 
         public string Run(IReadOnlyList<string> input)
         {
@@ -46,7 +48,7 @@ namespace Advent.Assignments
                         if (partLength * i != idString.Length)
                             continue;
 
-                        var factor = (long)Math.Pow(10, partLength);
+                        var factor = Powers[partLength];
                         var lower = id % factor;
 
                         var all = true;
