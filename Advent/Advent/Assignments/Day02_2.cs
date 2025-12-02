@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Advent.Assignments
@@ -45,8 +46,20 @@ namespace Advent.Assignments
                         if (partLength * i != idString.Length)
                             continue;
 
-                        var parts = idString.Chunk(partLength).ToList();
-                        if (parts.All(p => p.SequenceEqual(parts[0])))
+                        var factor = (long)Math.Pow(10, partLength);
+                        var lower = id % factor;
+
+                        var all = true;
+                        var tmp = id / factor;
+                        for (var k = 0; k < i - 1 && all; k++)
+                        {
+                            var upper = tmp % factor;
+                            tmp /= factor;
+                            if (upper != lower)
+                                all = false;
+                        }
+
+                        if (all)
                         {
                             //Logger.DebugLine($"{rangeStart}-{rangeEnd} has invalid ID {id}");
                             invalidIdSum += id;
