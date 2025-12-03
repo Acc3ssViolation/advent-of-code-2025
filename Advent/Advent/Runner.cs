@@ -51,6 +51,12 @@ namespace Advent
             var successful = 0;
             var failed = 0;
             var unknown = 0;
+
+            Logger.Line("=================================================", Logger.Green);
+            Logger.Line($"High resolution timer: {(Stopwatch.IsHighResolution ? "yes" : "no")}", Logger.Green);
+            Logger.Line($"Timer frequency: {Stopwatch.Frequency} Hz", Logger.Green);
+            Logger.Line("=================================================", Logger.Green);
+
             // Do a run on the test data
             Logger.Line("=================================================", Logger.Green);
             Logger.Line("Running test data", Logger.Green);
