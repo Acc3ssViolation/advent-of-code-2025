@@ -173,7 +173,7 @@ namespace Advent
                     Logger.DebugLine($"Loading data from {inputName} for assignment {assingment.Name}");
                     var lines = await File.ReadAllLinesAsync(inputName, cancellationToken).ConfigureAwait(false);
 
-                    GC.Collect();
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 
                     Logger.Line($"Running assignment {assingment.Name}");
                     stopwatch.Restart();

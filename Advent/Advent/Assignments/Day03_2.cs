@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Advent.Assignments
 {
@@ -18,11 +13,11 @@ namespace Advent.Assignments
 
             foreach (var bank in input)
             {
-                Array.Fill(highestJoltage, '0');
+                for (var i = 0; i < highestJoltage.Length; i++)
+                    highestJoltage[i] = '0';
                 
                 for (var bankIndex = 0; bankIndex < bank.Length; bankIndex++)
                 {
-                    var joltage = bank[bankIndex];
                     var batteriesIncludingThisOne = bank.Length - bankIndex;
                     var batteriesToSkip = BatteryCount - batteriesIncludingThisOne;
                     if (batteriesToSkip < 0)
@@ -32,17 +27,17 @@ namespace Advent.Assignments
                     //Logger.DebugLine($"[{("^".PadLeft(bankIndex + 1).PadRight(bank.Length))}]");
                     //Logger.DebugLine($"<{highestJoltage.ToNonSeparatedString()}>");
 
-                    for (var batteryNumber = batteriesToSkip; batteryNumber < BatteryCount; batteryNumber++)
+                    for (var batteryIndex = 0; batteryIndex < BatteryCount - batteriesToSkip; batteryIndex++)
                     {
-                        joltage = bank[bankIndex + batteryNumber - batteriesToSkip];
+                        var joltage = bank[bankIndex + batteryIndex];
 
-                        if (joltage > highestJoltage[batteryNumber])
+                        if (joltage > highestJoltage[batteriesToSkip + batteryIndex])
                         {
                             //Logger.DebugLine($"[{batteryNumber}] {joltage} > {highestJoltage[batteryNumber]}");
-                            highestJoltage[batteryNumber] = joltage;
-                            for (var k = batteryNumber + 1; k < BatteryCount; k++)
+                            highestJoltage[batteriesToSkip + batteryIndex] = joltage;
+                            for (var k = batteryIndex + 1; k < BatteryCount; k++)
                             {
-                                highestJoltage[k] = bank[bankIndex + k - batteriesToSkip];
+                                highestJoltage[k] = bank[bankIndex + k];
                             }
                             break;
                         }
