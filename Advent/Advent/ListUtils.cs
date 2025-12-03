@@ -29,5 +29,8 @@ namespace Advent
             double avg = values.Average();
             return Math.Sqrt(values.Average(v => Math.Pow(v - avg, 2)));
         }
+
+        public static string ToNonSeparatedString<T>(this IEnumerable<T> list)
+            => list.Aggregate("", (a, b) => $"{a}{b}");
     }
 }
