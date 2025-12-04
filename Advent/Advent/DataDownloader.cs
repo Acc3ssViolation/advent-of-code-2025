@@ -34,7 +34,11 @@ namespace Advent
             Logger.Line($"Downloading data for day {day} of the {_year} AoC edition...");
             var http = GetClient();
             var response = await http.GetAsync($"{BaseUrl}/{_year}/day/{day}/input", cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.ErrorLine($"Failed to download for day {day}, HTTP {(int)response.StatusCode} {response.StatusCode}");
+                return;
+            }
             using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using var fs = File.Create(file);
             await stream.CopyToAsync(fs, cancellationToken).ConfigureAwait(false);
