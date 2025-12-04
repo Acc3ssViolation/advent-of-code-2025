@@ -4,42 +4,57 @@ using System.Collections.Generic;
 
 namespace Advent.Shared
 {
-    public struct FixedList<T> : IEnumerable<T>
+    public sealed class FixedList<T> : IEnumerable<T>
     {
-        public T[] data;
-        public int length;
+        private readonly Memory<T> _data;
+        public int Count { get; private set; }
+
+        public FixedList(Memory<T> array)
+        {
+            _data = array;
+        }
 
         public void Add(T item)
         {
-            data[length++] = item;
+            _data.Span[Count++] = item;
+        }
+
+        public void Remove(T item)
+        {
+            var span = _data.Span;
+            for (var i = 0; i < Count; i++)
+            {
+                if (EqualityComparer<T>.Default.Equals(span[i], item))
+                {
+                    for (var k = i; k < Count - 1; k++)
+                        span[k] = span[k + 1];
+                    Count--;
+                    return;
+                }
+            }
         }
 
         public void Clear()
         {
-            length = 0;
+            Count = 0;
         }
 
-        public readonly Span<T> AsSpan()
+        public Span<T> AsSpan()
         {
-            return new Span<T>(data, 0, length);
+            return _data.Span;
         }
 
-        public readonly IEnumerator<T> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
-            for (var i = 0; i < length; i++)
+            for (var i = 0; i < Count; i++)
             {
-                yield return data[i];
+                yield return _data.Span[i];
             }
         }
 
-        readonly IEnumerator IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        public static FixedList<T> Create(T[] array)
-        {
-            return new FixedList<T> { data = array };
         }
     }
 }
