@@ -16,9 +16,13 @@ namespace Advent.Assignments
             var grid = new CharGrid(input);
 
             var accessibleRolls = 0;
-            
+
+            var dyMin = 0;
+
             for (var y = 0; y < grid.Height; y++)
             {
+                var dxMin = 0;
+
                 for (var x = 0; x < grid.Width; x++)
                 {
                     if (grid[new Point(x, y)] != '@')
@@ -26,9 +30,7 @@ namespace Advent.Assignments
 
                     var neighbourRolls = 0;
 
-                    var dxMin = (x > 0) ? -1 : 0;
-                    var dxMax = (x + 1< grid.Width) ? 1 : 0;
-                    var dyMin = (y > 0) ? -1 : 0;
+                    var dxMax = (x + 1 < grid.Width) ? 1 : 0;
                     var dyMax = (y + 1 < grid.Height) ? 1 : 0;
 
                     for (var dx = dxMin; dx <= dxMax && (neighbourRolls < MaxNeighbourRolls); dx++)
@@ -46,7 +48,11 @@ namespace Advent.Assignments
 
                     if (neighbourRolls < MaxNeighbourRolls)
                         accessibleRolls++;
+
+                    dxMin = -1;
                 }
+
+                dyMin = 1;
             }
 
             return accessibleRolls.ToString();
