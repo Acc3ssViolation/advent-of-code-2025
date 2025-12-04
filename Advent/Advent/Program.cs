@@ -7,8 +7,12 @@ using System.Linq;
 
 var runner = new Runner();
 
+#if DEBUG
 const int Iterations = 1;
-//Logger.SetLevel(LogLevel.Info);
+#else
+const int Iterations = 20;
+Logger.SetLevel(LogLevel.Info);
+#endif
 
 #if AUTO_LOAD_ASSIGNMENTS
 var interfaceType = typeof(IAssignment);
