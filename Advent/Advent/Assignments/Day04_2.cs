@@ -1,17 +1,17 @@
 ﻿using Advent.Shared;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Advent.Assignments
 {
-    internal class Day04_1 : IAssignment
+    internal class Day04_2 : IAssignment
     {
-        public string Run(IReadOnlyList<string> input)
+        private static void FindAccessibleRolls(CharGrid grid, List<Point> rolls)
         {
             const int MaxNeighbourRolls = 4;
-
-            var grid = new CharGrid(input);
-
-            var accessibleRolls = 0;
 
             var dyMin = 0;
 
@@ -42,13 +42,34 @@ namespace Advent.Assignments
                         }
 
                         if (neighbourRolls < MaxNeighbourRolls)
-                            accessibleRolls++;
+                            rolls.Add(new Point(x, y));
                     }
 
                     dxMin = -1;
                 }
 
                 dyMin = -1;
+            }
+        }
+
+        public string Run(IReadOnlyList<string> input)
+        {
+            var grid = new CharGrid(input);
+            var rolls = new List<Point>(2048);
+            var accessibleRolls = 0;
+
+            while (true)
+            {
+                FindAccessibleRolls(grid, rolls);
+                if (rolls.Count == 0)
+                    break;
+
+                accessibleRolls += rolls.Count;
+
+                for (var i = 0; i < rolls.Count; i++)
+                    grid[rolls[i]] = '.';
+
+                rolls.Clear();
             }
 
             return accessibleRolls.ToString();
