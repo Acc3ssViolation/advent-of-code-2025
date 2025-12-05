@@ -10,7 +10,7 @@ namespace Advent.Assignments
 {
     internal class Day05_2 : IAssignment
     {
-        private record Range(long Start, long End)
+        private record struct Range(long Start, long End)
         {
             public bool Overlaps(long value)
                 => Start <= value && value <= End;
