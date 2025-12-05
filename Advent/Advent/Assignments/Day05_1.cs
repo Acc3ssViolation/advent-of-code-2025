@@ -14,6 +14,13 @@ namespace Advent.Assignments
         {
             public bool Overlaps(long value)
                 => Start <= value && value <= End;
+
+            public bool Overlaps(Range range)
+            {
+                if (Start > range.End || End < range.Start)
+                    return false;
+                return true;
+            }
         }
 
         public string Run(IReadOnlyList<string> input)
@@ -34,7 +41,29 @@ namespace Advent.Assignments
                 span.Split(parts, '-');
                 var start = long.Parse(span[parts[0]], NumberStyles.None);
                 var end = long.Parse(span[parts[1]], NumberStyles.None);
-                ranges.Add(new Range(start, end));
+                var range = new Range(start, end);
+
+                var addNewRange = true;
+                for (var r = ranges.Count - 1; r > 0; r--)
+                {
+                    var existingRange = ranges[r];
+                    if (range.Overlaps(existingRange))
+                    {
+                        var mergedStart = Math.Min(range.Start, existingRange.Start);
+                        var mergedEnd = Math.Max(range.End, existingRange.End);
+                        if (mergedStart == existingRange.Start && mergedEnd == existingRange.End)
+                        {
+                            addNewRange = false;
+                            break;
+                        }
+
+                        ranges.RemoveAt(r);
+                        range = new Range(mergedStart, mergedEnd);
+                    }
+                }
+
+                if (addNewRange)
+                    ranges.Add(range);
             }
             // Skip empty line
             i++;
