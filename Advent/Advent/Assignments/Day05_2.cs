@@ -27,7 +27,7 @@ namespace Advent.Assignments
         {
             long freshIds = 0;
 
-            var ranges = new List<Range>();
+            var ranges = new List<Range>(128);
             Span<System.Range> parts = stackalloc System.Range[2];
 
             for (var i = 0; i < input.Count; i++)
