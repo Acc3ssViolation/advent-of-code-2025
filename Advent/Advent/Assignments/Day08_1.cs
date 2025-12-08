@@ -33,7 +33,6 @@ namespace Advent.Assignments
             int[] clusterSizes = new int[input.Count];
             var edgeCount = points.Length * (points.Length - 1) / 2;
             var edges = new MinHeap<Edge>(edgeCount);
-            var e = 0;
             Span<Range> parts = stackalloc Range[3];
             for (var i = 0; i < input.Count; i++)
             {
