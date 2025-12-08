@@ -1,0 +1,140 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Numerics;
+
+namespace Advent.Assignments
+{
+    internal class Day08_2 : IAssignment
+    {
+        private struct Edge : IComparable<Edge>
+        {
+            public int From;
+            public int To;
+            public float Length;
+
+            public Edge(int from, int to, float length)
+            {
+                From = from;
+                To = to;
+                Length = length;
+            }
+
+            public readonly int CompareTo(Edge other)
+            {
+                return Length.CompareTo(other.Length);
+            }
+        }
+
+        public string Run(IReadOnlyList<string> input)
+        {
+            var pointCount = input.Count;
+            Vector3[] points = new Vector3[pointCount];
+            int[] clusters = new int[pointCount];
+            int[] clusterSizes = new int[pointCount];
+            var edgeCount = points.Length * (points.Length - 1) / 2;
+            var edges = new Edge[edgeCount];
+            var e = 0;
+            Span<Range> parts = stackalloc Range[3];
+            for (var i = 0; i < input.Count; i++)
+            {
+                var span = input[i].AsSpan();
+                span.Split(parts, ',');
+                var x = float.Parse(span[parts[0]], NumberStyles.None);
+                var y = float.Parse(span[parts[1]], NumberStyles.None);
+                var z = float.Parse(span[parts[2]], NumberStyles.None);
+                points[i] = new Vector3(x, y, z);
+
+                // Connect the edges
+                for (var j = 0; j < i; j++)
+                {
+                    var from = points[j];
+                    var to = points[i];
+                    edges[e++] = new Edge(i, j, Vector3.DistanceSquared(from, to));
+                }
+            }
+
+            // Sort edges by length
+            Array.Sort(edges);
+
+            var clusterId = 1;
+            var edgeIndex = 0;
+            var clusterCount = pointCount;
+
+            var bound = input.Count > 25 ? 1000 : 10;
+
+            while (true)
+            {
+                var edge = edges[edgeIndex];
+
+                //Logger.DebugLine($"Connecting [{points[edge.From]}] to [{points[edge.To]}]");
+
+                edgeIndex++;
+
+                var fromCluster = clusters[edge.From];
+                var toCluster = clusters[edge.To];
+
+                if (fromCluster == 0 && toCluster == 0)
+                {
+                    // Neither is in a cluster, create a new cluster!
+                    //Logger.DebugLine($"> Creating new cluster {clusterId}");
+                    clusters[edge.From] = clusters[edge.To] = clusterId;
+                    clusterSizes[clusterId] += 2;
+
+                    // Here we "merge" two 1 sized clusters, so the count goes down by one
+                    clusterCount--;
+
+                    clusterId++;
+                }
+                else if (fromCluster == 0 && toCluster != 0)
+                {
+                    // Join toCluster
+                    //Logger.DebugLine($"> Joining cluster {toCluster}");
+                    clusters[edge.From] = toCluster;
+                    clusterSizes[toCluster]++;
+
+                    // Here we "merge" a 1 sized clusters into a big one, so the count goes down by one
+                    clusterCount--;
+                }
+                else if (fromCluster != 0 && toCluster == 0)
+                {
+                    // Join fromCluster
+                    //Logger.DebugLine($"> Joining cluster {fromCluster}");
+                    clusters[edge.To] = fromCluster;
+                    clusterSizes[fromCluster]++;
+
+                    // Here we "merge" a 1 sized clusters into a big one, so the count goes down by one
+                    clusterCount--;
+                }
+                else if (fromCluster != 0 && toCluster != 0 && fromCluster == toCluster)
+                {
+                    // Both are in the same cluster, nothing happens
+                    //Logger.DebugLine($"> Both in cluster {fromCluster}");
+                }
+                else
+                {
+                    // Both are in a cluster, so both clusters must be merged
+                    //Logger.DebugLine($"> Merging cluster {fromCluster} into cluster {toCluster}");
+
+                    for (var i = 0; i < clusters.Length; i++)
+                        if (clusters[i] == fromCluster)
+                            clusters[i] = toCluster;
+
+                    clusterSizes[toCluster] += clusterSizes[fromCluster];
+                    clusterSizes[fromCluster] = 0;
+
+                    // Here we merge two clusters into one
+                    clusterCount--;
+                }
+
+                if (clusterCount == 1)
+                {
+                    var fromX = (long)points[edge.From].X;
+                    var toX = (long)points[edge.To].X;
+                    var result = fromX * toX;
+                    return result.ToString();
+                }
+            }
+        }
+    }
+}
