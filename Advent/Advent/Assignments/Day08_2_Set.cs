@@ -53,7 +53,10 @@ namespace Advent.Assignments
                 {
                     var from = points[j];
                     var to = points[i];
-                    var edge = new Edge(i, j, Vector3.DistanceSquared(from, to));
+                    var d = Vector3.DistanceSquared(from, to);
+                    if (d > 500000000)
+                        continue;
+                    var edge = new Edge(i, j, d);
                     edgeHeap.Insert(edge);
                 }
             }
