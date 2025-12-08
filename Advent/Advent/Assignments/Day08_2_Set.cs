@@ -78,6 +78,8 @@ namespace Advent.Assignments
             }
         }
 
+        
+        
         public string Run(IReadOnlyList<string> input)
         {
             var pointCount = input.Count;
@@ -86,6 +88,7 @@ namespace Advent.Assignments
             int[] clusterSizes = new int[pointCount];
             var edgeCount = points.Length * (points.Length - 1) / 2;
             var edges = new Edge[edgeCount];
+            var edgeHeap = new MinHeap<Edge>(edgeCount);
             var e = 0;
             Span<Range> parts = stackalloc Range[3];
             for (var i = 0; i < input.Count; i++)
@@ -102,12 +105,14 @@ namespace Advent.Assignments
                 {
                     var from = points[j];
                     var to = points[i];
-                    edges[e++] = new Edge(i, j, Vector3.DistanceSquared(from, to));
+                    var edge = new Edge(i, j, Vector3.DistanceSquared(from, to));
+                    edges[e++] = edge;
+                    edgeHeap.Insert(edge);
                 }
             }
 
             // Sort edges by length
-            Array.Sort(edges);
+            //HeapSort(edges);
 
             // Create a new forest of sets (each point is added as a set)
             var forest = new Forest<Vector3>(points);
@@ -116,7 +121,7 @@ namespace Advent.Assignments
             var clusterCount = pointCount;
             for (var i = 0; i < edges.Length; i++)
             {
-                var edge = edges[i];
+                var edge = edgeHeap.Pop();
                 var fromSet = forest.FindSetIndex(edge.From);
                 var toSet = forest.FindSetIndex(edge.To);
                 if (fromSet != toSet)

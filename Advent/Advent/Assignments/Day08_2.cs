@@ -33,7 +33,7 @@ namespace Advent.Assignments
             int[] clusters = new int[pointCount];
             int[] clusterSizes = new int[pointCount];
             var edgeCount = points.Length * (points.Length - 1) / 2;
-            var edges = new Edge[edgeCount];
+            var edges = new MinHeap<Edge>(edgeCount);
             var e = 0;
             Span<Range> parts = stackalloc Range[3];
             for (var i = 0; i < input.Count; i++)
@@ -50,12 +50,9 @@ namespace Advent.Assignments
                 {
                     var from = points[j];
                     var to = points[i];
-                    edges[e++] = new Edge(i, j, Vector3.DistanceSquared(from, to));
+                    edges.Insert(new Edge(i, j, Vector3.DistanceSquared(from, to)));
                 }
             }
-
-            // Sort edges by length
-            Array.Sort(edges);
 
             var clusterId = 1;
             var edgeIndex = 0;
@@ -65,7 +62,7 @@ namespace Advent.Assignments
 
             while (true)
             {
-                var edge = edges[edgeIndex];
+                var edge = edges.Pop();
 
                 //Logger.DebugLine($"Connecting [{points[edge.From]}] to [{points[edge.To]}]");
 
