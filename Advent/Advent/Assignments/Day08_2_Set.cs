@@ -29,56 +29,6 @@ namespace Advent.Assignments
                 return Length.CompareTo(other.Length);
             }
         }
-
-        private struct Forest<T>
-        {
-            public T[] Elements;
-            public int[] Parent;
-            public int[] Rank;
-
-            public Forest(T[] elements)
-            {
-                Elements = elements;
-                Parent = new int[Elements.Length];
-                Rank = new int[Elements.Length];
-
-                for (var i = 0; i < Elements.Length; i++)
-                {
-                    Parent[i] = i;
-                    Rank[i] = 0;
-                }
-            }
-
-            public readonly int FindSetIndex(int elementIndex)
-            {
-                while (Parent[elementIndex] != elementIndex)
-                {
-                    Parent[elementIndex] = Parent[Parent[elementIndex]];
-                    elementIndex = Parent[elementIndex];
-                }
-                return elementIndex;
-            }
-
-            public int Union(int a, int b)
-            {
-                a = FindSetIndex(a);
-                b = FindSetIndex(b);
-
-                if (a == b)
-                    return a;
-                
-                if (Rank[a] < Rank[b])
-                    (a, b) = (b, a);
-
-                Parent[b] = a;
-                if (Rank[a] == Rank[b])
-                    Rank[a]++;
-
-                return a;
-            }
-        }
-
-        
         
         public string Run(IReadOnlyList<string> input)
         {
@@ -87,7 +37,6 @@ namespace Advent.Assignments
             int[] clusters = new int[pointCount];
             int[] clusterSizes = new int[pointCount];
             var edgeCount = points.Length * (points.Length - 1) / 2;
-            var edges = new Edge[edgeCount];
             var edgeHeap = new MinHeap<Edge>(edgeCount);
             var e = 0;
             Span<Range> parts = stackalloc Range[3];
@@ -106,20 +55,16 @@ namespace Advent.Assignments
                     var from = points[j];
                     var to = points[i];
                     var edge = new Edge(i, j, Vector3.DistanceSquared(from, to));
-                    edges[e++] = edge;
                     edgeHeap.Insert(edge);
                 }
             }
 
-            // Sort edges by length
-            //HeapSort(edges);
-
             // Create a new forest of sets (each point is added as a set)
-            var forest = new Forest<Vector3>(points);
+            var forest = new UnionFind<Vector3>(points);
 
             // Do Kruskal's thing
             var clusterCount = pointCount;
-            for (var i = 0; i < edges.Length; i++)
+            for (var i = 0; i < edgeCount; i++)
             {
                 var edge = edgeHeap.Pop();
                 var fromSet = forest.FindSetIndex(edge.From);
@@ -138,7 +83,7 @@ namespace Advent.Assignments
                 }
             }
 
-            return "FUCK";
+            return "Nope";
         }
     }
 }

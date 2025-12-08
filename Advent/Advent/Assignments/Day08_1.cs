@@ -1,13 +1,7 @@
-﻿using Advent.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Advent.Assignments
 {
@@ -60,8 +54,6 @@ namespace Advent.Assignments
             }
 
             var clusterId = 1;
-            var edgeIndex = 0;
-
             var bound = input.Count > 25 ? 1000 : 10;
 
             for (var round = 1; round <= bound; round++)
@@ -69,8 +61,6 @@ namespace Advent.Assignments
                 var edge = edges.Pop();
 
                 //Logger.DebugLine($"Connecting [{points[edge.From]}] to [{points[edge.To]}]");
-
-                edgeIndex++;
 
                 var fromCluster = clusters[edge.From];
                 var toCluster = clusters[edge.To];

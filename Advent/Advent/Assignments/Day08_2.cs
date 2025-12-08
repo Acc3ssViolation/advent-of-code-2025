@@ -55,18 +55,13 @@ namespace Advent.Assignments
             }
 
             var clusterId = 1;
-            var edgeIndex = 0;
             var clusterCount = pointCount;
-
-            var bound = input.Count > 25 ? 1000 : 10;
 
             while (true)
             {
                 var edge = edges.Pop();
 
                 //Logger.DebugLine($"Connecting [{points[edge.From]}] to [{points[edge.To]}]");
-
-                edgeIndex++;
 
                 var fromCluster = clusters[edge.From];
                 var toCluster = clusters[edge.To];
