@@ -130,9 +130,7 @@ namespace Advent.Assignments
                 //grid[offsetPoints[i]] = 'O';
             }
 
-
             // Build edge lists
-
             for (var i = 0; i < points.Length; i++)
             {
                 var j = (i + 1) % points.Length;
@@ -163,6 +161,7 @@ namespace Advent.Assignments
                 }
             }
 
+            // Sort edges
             verticalEdges.Sort();
             horizontalEdges.Sort();
 
