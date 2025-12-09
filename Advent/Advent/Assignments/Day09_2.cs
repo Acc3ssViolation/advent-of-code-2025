@@ -181,9 +181,10 @@ namespace Advent.Assignments
             var biggestArea = 0L;
             for (var i = 0; i < points.Length; i++)
             {
+                var fromPoint = points[i];
+
                 for (var j = i + 1; j < points.Length; j++)
                 {
-                    var fromPoint = points[i];
                     var toPoint = points[j];
 
                     // Get bounding box of the area
@@ -214,7 +215,7 @@ namespace Advent.Assignments
                     // |     |
                     // C --- B
 
-                    static bool DoThing(FixedList<Edge> edges, int axisMin, int axisMax, int min, int max)
+                    static bool IntersectsEdges(FixedList<Edge> edges, int axisMin, int axisMax, int min, int max)
                     {
                         // Find first edge
                         var i = 0;
@@ -222,44 +223,29 @@ namespace Advent.Assignments
                             if (edges[i].Coord >= axisMin)
                                 break;
 
-                        // If we got through all edges we didn't find any
-                        if (i == edges.Count)
-                            return true;
-
                         // Now check every axis coordinate for overlap
                         while (i < edges.Count && edges[i].Coord < axisMax)
                         {
                             if (edges[i].Overlaps(min) || edges[i].Overlaps(max))
-                                return false;
+                                return true;
                             i++;
                         }
 
                         // No overlap
-                        return true;
+                        return false;
                     }
 
-                    var isValid = true;
                     // A --- D
                     // C --- B
+                    var intersectsEdge = IntersectsEdges(verticalEdges, xMin, xMax, yMin, yMax);
 
-                    {
-                        isValid = DoThing(verticalEdges, xMin, xMax, yMin, yMax);
-                    }
                     // A    D
                     // |    |
                     // C    B
-                    {
-                        isValid &= DoThing(horizontalEdges, yMin, yMax, xMin, xMax);
-                    }
+                    intersectsEdge |= IntersectsEdges(horizontalEdges, yMin, yMax, xMin, xMax);
 
-                    if (isValid)
-                    {
+                    if (!intersectsEdge)
                         biggestArea = area;
-                    }
-                    else
-                    {
-                        //Logger.WarningLine($"{fromPoint} to {toPoint} goes outside the shape");
-                    }
                 }
             }
 
