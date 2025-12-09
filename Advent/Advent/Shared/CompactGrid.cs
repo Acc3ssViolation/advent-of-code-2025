@@ -37,5 +37,21 @@ namespace Advent.Shared
             }
             return new string(sb);
         }
+
+        public string ToString(char[] tileValues)
+        {
+            var nl = Environment.NewLine.Length;
+            var sb = new char[((Width + nl) * Height)];
+
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    sb[y * (Width + nl) + x] = tileValues[_data[y * Width + x]];
+                }
+                Environment.NewLine.CopyTo(sb.AsSpan(y * (Width + nl) + Width, nl));
+            }
+            return new string(sb);
+        }
     }
 }
