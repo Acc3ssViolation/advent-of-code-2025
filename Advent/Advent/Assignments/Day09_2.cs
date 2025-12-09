@@ -199,6 +199,16 @@ namespace Advent.Assignments
                     else
                         (yMin, yMax) = (toPoint.y, fromPoint.y);
 
+                    // This can work!
+                    long dx = (xMax / 10) - (xMin / 10) + 1;
+                    long dy = (yMax / 10) - (yMin / 10) + 1;
+                    var area = dx * dy;
+
+                    //Logger.DebugLine($"{fromPoint} to {toPoint} has area {area}");
+
+                    if (area <= biggestArea)
+                        continue;
+
                     // Note that (0,0) is the top left corner
                     // A --- D
                     // |     |
@@ -244,15 +254,7 @@ namespace Advent.Assignments
 
                     if (isValid)
                     {
-                        // This can work!
-                        long dx = (xMax / 10) - (xMin / 10) + 1;
-                        long dy = (yMax / 10) - (yMin / 10) + 1;
-                        var area = dx * dy;
-
-                        //Logger.DebugLine($"{fromPoint} to {toPoint} has area {area}");
-
-                        if (area > biggestArea)
-                            biggestArea = area;
+                        biggestArea = area;
                     }
                     else
                     {
