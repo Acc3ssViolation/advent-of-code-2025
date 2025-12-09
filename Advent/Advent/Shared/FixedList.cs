@@ -9,6 +9,8 @@ namespace Advent.Shared
         private readonly Memory<T> _data;
         public int Count { get; private set; }
 
+        public T this[int index] => _data.Span[index];
+
         public FixedList(Memory<T> array)
         {
             _data = array;
@@ -17,6 +19,11 @@ namespace Advent.Shared
         public void Add(T item)
         {
             _data.Span[Count++] = item;
+        }
+
+        public void Sort()
+        {
+            _data.Span[..Count].Sort();
         }
 
         public void Remove(T item)
