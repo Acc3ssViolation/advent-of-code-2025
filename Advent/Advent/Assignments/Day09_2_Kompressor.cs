@@ -1,13 +1,7 @@
 ﻿using Advent.Shared;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Advent.Assignments
 {
@@ -16,17 +10,6 @@ namespace Advent.Assignments
         public string InputFile => "day09.txt";
         public int Day => 9;
         public int Part => 2;
-
-        private record struct Edge(int Coord, int Start, int End) : IComparable<Edge>
-        {
-            public readonly int CompareTo(Edge other)
-            {
-                return Coord.CompareTo(other.Coord);
-            }
-
-            public readonly bool Overlaps(int value)
-                => value >= Start && value <= End;
-        }
 
         const byte TileInside = 0;
         const byte TileRed = 1;
@@ -51,7 +34,6 @@ namespace Advent.Assignments
                 points[i] = new Point(x, y);
                 xCoordinates[i] = x;
                 yCoordinates[i] = y;
-                //grid[points[i]] = '#';
             }
 
             Array.Sort(xCoordinates);
@@ -68,7 +50,7 @@ namespace Advent.Assignments
                 grid[point] = TileRed;
             }
 
-            // Build edge lists
+            // Build edges in the grid
             for (var i = 0; i < points.Length; i++)
             {
                 var j = (i + 1) % points.Length;
