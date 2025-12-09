@@ -217,11 +217,18 @@ namespace Advent.Assignments
 
                     static bool IntersectsEdges(FixedList<Edge> edges, int axisMin, int axisMax, int min, int max)
                     {
-                        // Find first edge
-                        var i = 0;
-                        for (; i < edges.Count; i++)
-                            if (edges[i].Coord >= axisMin)
-                                break;
+                        // Find first edge (binary search)
+                        var l = 0;
+                        var r = edges.Count;
+                        while (l < r)
+                        {
+                            var m = l + (r - l) / 2;
+                            if (edges[m].Coord < axisMin)
+                                l = m + 1;
+                            else
+                                r = m;
+                        }
+                        var i = l;
 
                         // Now check every axis coordinate for overlap
                         while (i < edges.Count && edges[i].Coord < axisMax)
