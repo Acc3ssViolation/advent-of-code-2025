@@ -22,5 +22,7 @@ namespace Advent
 #endif
 
         public static readonly string DataDirectory = Path.Combine(BaseDir, "Data");
+
+        public static readonly string TestDirectory = Path.Combine(BaseDir, "Test");
     }
 }

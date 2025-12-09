@@ -74,7 +74,7 @@ namespace Advent
 
                 try
                 {
-                    var inputName = Path.Combine(PathManager.DataDirectory, assingment.TestFile.ToLowerInvariant());
+                    var inputName = Path.Combine(PathManager.TestDirectory, assingment.TestFile.ToLowerInvariant());
 
                     if (!File.Exists(inputName))
                         continue;
