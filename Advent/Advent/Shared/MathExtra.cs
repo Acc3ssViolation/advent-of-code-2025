@@ -6,6 +6,11 @@ namespace Advent.Shared
 {
     internal static class MathExtra
     {
+        public static int LowestCommonMultiple(this IEnumerable<int> nums)
+        {
+            return nums.Aggregate((a, b) => (int)LowestCommonMultiple(a, b));
+        }
+
         public static long LowestCommonMultiple(this IEnumerable<long> nums)
         {
             return nums.Aggregate(LowestCommonMultiple);

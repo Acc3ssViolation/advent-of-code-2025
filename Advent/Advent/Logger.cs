@@ -70,6 +70,7 @@ namespace Advent
             }
         }
 
+        [Conditional("DEBUG")]
         public static void DebugLine(string message)
         {
             if (_level > LogLevel.Debug) return;
