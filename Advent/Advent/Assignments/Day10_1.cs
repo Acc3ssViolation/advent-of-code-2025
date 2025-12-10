@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ namespace Advent.Assignments
                 var sb = new StringBuilder();
 
                 sb.Append('[');
-                for (var bit = Joltages.Length; bit > 0; bit--)
+                for (var bit = 0; bit < Joltages.Length; bit++)
                     if ((Lights & (1 << bit)) != 0)
                         sb.Append('#');
                     else 
@@ -79,14 +81,15 @@ namespace Advent.Assignments
                     c++;    // Skip [
                     while (line[c] != ']')
                     {
+                        lights >>= 1;
                         if (line[c] == '#')
-                            lights |= 1;
-                        lights <<= 1;
+                            lights |= 0x80000000;
                         lightCount++;
 
                         c++;
                     }
                     c++;    // skip ]
+                    lights >>= 32 - lightCount;
                 }
 
                 // Parse buttons
@@ -138,7 +141,42 @@ namespace Advent.Assignments
                 joltagesIndex += joltageCount;
             }
 
-            return "";
+            // TODO: There is no point in storing them in an array, just make this part of the parsing loop...
+            //
+            // Now process the machines!
+            //
+            var totalButtonPresses = 0L;
+            for (var m = 0; m < machines.Length; m++)
+            {
+                ref var machine = ref machines[m];
+
+                // Run through every combination of buttons, where each button is pressed at most once
+                // as they act as an XOR, and Button ^ Button = 0
+                var buttonCount = machine.Buttons.Length;
+                var combinations = 2 << (buttonCount - 1);
+                var minPressedCount = 1000;
+                var buttonSpan = machine.Buttons.Span;
+                for (var buttonMask = 1U; buttonMask < combinations; buttonMask++)
+                {
+                    var value = 0U;
+                    var buttonsPressed = BitOperations.PopCount(buttonMask);
+                    if (buttonsPressed >= minPressedCount)
+                        continue;
+
+                    for (var i = 0; i < buttonCount; i++)
+                    {
+                        if ((buttonMask & (1 << i)) != 0)
+                            value ^= buttonSpan[i];
+                    }
+                    if (value == machine.Lights)
+                        minPressedCount = buttonsPressed;
+                }
+
+                // Logger.DebugLine($"Machine {machine} needs {minPressedCount} button presses");
+                totalButtonPresses += minPressedCount;
+            }
+
+            return totalButtonPresses.ToString();
         }
     }
 }
