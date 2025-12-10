@@ -1,16 +1,9 @@
-﻿using Advent.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
-using System.Threading.Tasks;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics;
-
-using V = MathNet.Numerics.LinearAlgebra.Vector<float>;
-using M = MathNet.Numerics.LinearAlgebra.Matrix<float>;
+using Google.OrTools.LinearSolver;
 
 namespace Advent.Assignments
 {
@@ -69,6 +62,9 @@ namespace Advent.Assignments
         {
             Span<Range> joltageParts = stackalloc Range[10];
 
+
+            using var solver = Solver.CreateSolver("SCIP");
+            Debug.Assert(solver != null);
             var totalButtonPresses = 0L;
 
             for (var inputIndex = 0; inputIndex < input.Count; inputIndex++)
@@ -89,9 +85,7 @@ namespace Advent.Assignments
 
                 // Parse buttons
                 var columns = line.Count(c => c == '(');
-                var rowData = new V[rows];
-                for (var r = 0; r < rows; r++)
-                    rowData[r] = V.Build.Dense(columns + 1);
+                var rowData = new int[rows, columns];
 
                 {
                     var col = 0;
@@ -105,7 +99,7 @@ namespace Advent.Assignments
                         else if (chr >= '0' && chr <= '9')
                         {
                             var bit = chr - '0';
-                            rowData[bit][col] = 1;
+                            rowData[bit, col] = 1;
                         }
                         else if (chr == '{')
                         {
@@ -117,8 +111,7 @@ namespace Advent.Assignments
                 }
 
                 // Parse joltages
-                var duplicates = new HashSet<int>();
-                var joltages = V.Build.Dense(rows);
+                var joltages = new int[rows];
                 {
                     c++;    // Skip {
                     var joltageString = line.AsSpan().Slice(c, line.Length - c - 1);
@@ -126,92 +119,36 @@ namespace Advent.Assignments
                     for (var j = 0; j < joltageCount; j++)
                     {
                         var joltage = int.Parse(joltageString[joltageParts[j]], System.Globalization.NumberStyles.None);
-                        if (joltages.Any(j => joltage == j))
-                            duplicates.Add(j);
-                        else
-                            joltages[j] = joltage;
+                        joltages[j] = joltage;
                     }
                 }
 
-                // Do linear algebra. Buttons are columns, Joltages is the desired output vector. Button presses is the input vector.
-                var matrix = M.Build.Dense(rows - duplicates.Count, columns + 1, 0);
-                var rowIndex = 0;
-
+                var variablesToSolve = solver.MakeIntVarArray(columns, 0, double.PositiveInfinity);
                 for (var row = 0; row < rows; row++)
                 {
-                    if (duplicates.Contains(row))
-                        continue;
-                    rowData[row][columns] = joltages[row];
-                    matrix.SetRow(rowIndex++, rowData[row]);
-
+                    var value = joltages[row];
+                    var constraint = solver.MakeConstraint(value, value, $"Constraint #{row}");
+                    for (var col = 0; col < columns; col++)
+                        constraint.SetCoefficient(variablesToSolve[col], rowData[row,col]);
                 }
+                var objective = solver.Objective();
+                objective.SetMinimization();
+                for (var col = 0; col < columns; col++)
+                    objective.SetCoefficient(variablesToSolve[col], 1);
+                var result = solver.Solve();
+                Debug.Assert(result is Solver.ResultStatus.OPTIMAL or Solver.ResultStatus.FEASIBLE);
+                Logger.DebugLine("==========================");
+                Logger.DebugLine($"Objective: {objective.Value()}");
+                for (var col = 0; col < columns; col++)
+                    Logger.DebugLine($"X{col} = {variablesToSolve[col].SolutionValue()}");
+                Logger.DebugLine("==========================");
 
-                Logger.DebugLine("==========================");
-                Logger.DebugLine(line);
-                Logger.DebugLine("==========================");
-                Logger.DebugLine(matrix.ToString());
-                GaussianElimination(matrix);
-                Logger.DebugLine(matrix.ToString());
+                totalButtonPresses += (long)objective.Value();
+
+                solver.Clear();
             }
 
             return totalButtonPresses.ToString();
-        }
-
-        public void GaussianElimination(M matrix)
-        {
-            var m = matrix.RowCount;
-            var n = matrix.ColumnCount;
-
-            var h = 0;
-            var k = 0;
-            while (h < m && k < n)
-            {
-                Logger.DebugLine($"[{h},{k}]\n{matrix}");
-
-                var iMax = ArgMaxRow(matrix, h, m, k);
-                if (matrix[iMax, k].AlmostEqual(0))
-                {
-                    // No pivot, move to next column
-                    Logger.DebugLine($"No pivot in column {k}");
-                    k++;
-                }
-                else
-                {
-                    // Swap rows h and iMax
-                    Logger.DebugLine($"> Swapping rows {iMax} and {h}");
-                    for (var column = 0; column < matrix.ColumnCount; column++)
-                    {
-                        (matrix[h, column], matrix[iMax, column]) = (matrix[iMax, column], matrix[h, column]);
-                    }
-
-                    // Loop through all rows below the pivot
-                    for (var i = h + 1; i < m; i++)
-                    {
-                        var f = matrix[i, k] / matrix[h, k];
-                        Logger.DebugLine($"> Setting [{i},{k}] to 0 (f = {f})");
-                        matrix[i, k] = 0;
-                        for (var j = k + 1; j < n; j++)
-                            matrix[i, j] = matrix[i, j] - matrix[h, j] * f;
-                    }
-
-                    h++;
-                    k++;
-                }
-            }
-        }
-
-        private int ArgMaxRow(M matrix, int h, int m, int k)
-        {
-            var iMax = -1;
-            var valueMax = double.MinValue;
-            for (var i = h; i < m; i++)
-                if (matrix[i, k] > valueMax)
-                {
-                    valueMax = matrix[i, k];
-                    iMax = i;
-                }
-            Debug.Assert(iMax >= 0);
-            return iMax;
         }
     }
 }
