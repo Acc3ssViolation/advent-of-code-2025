@@ -23,7 +23,7 @@ namespace Advent.Benchmark
         [Benchmark]
         public void FixedList()
         {
-            var list = FixedList<int>.Create(new int[N]);
+            var list = new FixedList<int>(new int[N]);
             for (var i = 0; i < N; i++)
             {
                 list.Add(i);
